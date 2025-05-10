@@ -1,8 +1,9 @@
-# main.py
 from fastapi import FastAPI
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from saju_logic import calculate_fake_saju
+from fastapi.responses import Response
+from pydantic import BaseModel
+from .saju_logic import calculate_fake_saju
+import json
 
 app = FastAPI()
 
@@ -19,12 +20,14 @@ class AnalyzeRequest(BaseModel):
     month: int
     day: int
     time: str
-    type: str  # 양력 or 음력
+    type: str
 
-class AnalyzeResponse(BaseModel):
-    result: str
-
-@app.post("/analyze", response_model=AnalyzeResponse)
+@app.post("/analyze")
 async def analyze(req: AnalyzeRequest):
     result = calculate_fake_saju(req.year, req.month, req.day, req.time, req.type)
-    return {"result": result}
+
+    # 수동으로 utf-8 인코딩된 JSON 응답 생성
+    return Response(
+        content=json.dumps({"result": result}, ensure_ascii=False),
+        media_type="application/json; charset=utf-8"
+    )
