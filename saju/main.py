@@ -53,7 +53,7 @@ async def ask_gpt(req: AskRequest):
         )
 
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "당신은 사주 전문가입니다. 친절하고 현실적인 조언을 제공합니다."},
                 {"role": "user", "content": prompt}
