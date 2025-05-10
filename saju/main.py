@@ -71,3 +71,5 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))  # Render에서는 환경 변수 PORT를 사용
     uvicorn.run("saju.main:app", host="0.0.0.0", port=port)
+
+print("OpenAI KEY LOADED:", openai.api_key)
