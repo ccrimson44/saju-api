@@ -66,6 +66,19 @@ async def ask_gpt(req: AskRequest):
     except Exception as e:
         return JSONResponse(content={"answer": f"오류 발생: \n{str(e)}"}, media_type="application/json; charset=utf-8")
 
+@app.get("/test-openai")
+async def test_openai():
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": "Hello, who are you?"}
+            ]
+        )
+        return {"ok": True, "reply": response.choices[0].message["content"]}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
 # 🔹 로컬 및 Render 호환 실행 설정
 if __name__ == "__main__":
     import uvicorn
