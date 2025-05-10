@@ -4,6 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 import openai
+import firebase_admin
+from firebase_admin import credentials, firestore
+from datetime import datetime
+
+# Firebase 초기화
+cred = credentials.Certificate("firebase-credentials.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # 환경변수에서 OpenAI API 키 가져오기
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -31,6 +39,7 @@ class AnalyzeRequest(BaseModel):
 class AskRequest(BaseModel):
     saju_text: str
     question: str
+    user_id: str  # 사용자 식별을 위한 ID 추가
 
 # ▶︎ GPT 응답 반환 형식
 class AnswerResponse(BaseModel):
@@ -61,6 +70,17 @@ async def ask_gpt(req: AskRequest):
         )
 
         answer = response.choices[0].message["content"]
+        
+        # Firebase에 저장 (사용자 ID 포함)
+        doc_ref = db.collection('saju_responses').document()
+        doc_ref.set({
+            'user_id': req.user_id,  # 사용자 ID 저장
+            'saju_text': req.saju_text,
+            'question': req.question,
+            'answer': answer,
+            'timestamp': datetime.now()
+        })
+
         return JSONResponse(content={"answer": answer}, media_type="application/json; charset=utf-8")
 
     except Exception as e:
