@@ -53,6 +53,12 @@ async def ask_gpt(data: GPTRequest):
             media_type="application/json; charset=utf-8"
         )
 
+@app.get("/debug/openai-key")
+def debug_openai_key():
+    api_key = os.getenv("OPENAI_API_KEY", "❌ 환경변수 없음")
+    masked_key = api_key[:5] + "..." + api_key[-4:] if "sk-" in api_key else api_key
+    return {"OPENAI_API_KEY": masked_key}
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
